@@ -12,8 +12,9 @@ require('@solana/wallet-adapter-react-ui/styles.css');
 export const SolanaWalletProvider = ({ children }: { children: React.ReactNode }) => {
     const network = WalletAdapterNetwork.Devnet;
 
-    // Use the provided Helius Key
-    const endpoint = "https://devnet.helius-rpc.com/?api-key=d8e6c21f-7aff-4084-9d2e-faa6d962e246";
+    // Use the provided Helius Key from Environment Variables
+    const apiKey = process.env.NEXT_PUBLIC_HELIUS_API_KEY;
+    const endpoint = `https://devnet.helius-rpc.com/?api-key=${apiKey}`;
 
     const wallets = useMemo(
         () => [
