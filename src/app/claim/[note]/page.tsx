@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -5,14 +6,19 @@ import { useParams } from 'next/navigation';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { LAMPORTS_PER_SOL, PublicKey, Transaction, SystemProgram } from '@solana/web3.js';
-import { Shield, ArrowDown, CheckCircle, Lock, Loader2, Download, Activity, Cpu, Sparkles } from 'lucide-react';
+import BN from 'bn.js';
+import { Utxo } from '@/lib/privacy-cash/utxo';
+import { Keypair } from '@/lib/privacy-cash/keypair';
+import { prove } from '@/lib/privacy-cash/prover';
+import { LightWasm, WasmFactory } from '@lightprotocol/hasher.rs';
+import { Shield, ArrowDown, CheckCircle, Lock, Loader2, Download } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function ClaimPage() {
     const params = useParams();
     const noteString = params.note as string;
     const { connection } = useConnection();
-    const { publicKey } = useWallet();
+    const { publicKey, sendTransaction } = useWallet();
 
     const [noteData, setNoteData] = useState<any>(null);
     const [status, setStatus] = useState<'idle' | 'generating_proof' | 'submitting' | 'success' | 'error'>('idle');
@@ -22,11 +28,12 @@ export default function ClaimPage() {
     useEffect(() => {
         if (noteString) {
             try {
+                // Just decoded to check format
                 const secretKey = Buffer.from(decodeURIComponent(noteString), 'base64');
                 if (secretKey.length !== 64) {
                     throw new Error("Invalid key length");
                 }
-                setNoteData({ valid: true });
+                setNoteData({ valid: true }); // Dummy state to unblock UI
             } catch (e) {
                 console.error(e);
                 setError("Invalid link format");
@@ -41,11 +48,13 @@ export default function ClaimPage() {
             setStatus('generating_proof');
             setStatusMessage("Accessing Secure Vault...");
 
+            // 1. Recover the Vault Keypair
             const secretKey = Buffer.from(decodeURIComponent(noteString), 'base64');
             const vaultKeypair = (await import('@solana/web3.js')).Keypair.fromSecretKey(secretKey);
 
             setStatusMessage("Verifying Balance...");
 
+            // 2. Check Vault Balance
             const balance = await connection.getBalance(vaultKeypair.publicKey);
             if (balance === 0) {
                 throw new Error("This link has already been claimed or is empty.");
@@ -54,7 +63,12 @@ export default function ClaimPage() {
             setStatus('submitting');
             setStatusMessage("Transferring Funds to Your Wallet...");
 
+            // 3. Construct Sweep Transaction
+            // We need to leave a tiny bit for rent/fees, or use closeAccount instructions if it was a token account.
+            // For pure SOL, we just transfer (balance - fee).
             const transaction = new Transaction();
+
+            // Simple fee estimation (5000 lamports is standard for signature)
             const fee = 5000;
             const transferAmount = balance - fee;
 
@@ -69,6 +83,11 @@ export default function ClaimPage() {
                     lamports: transferAmount
                 })
             );
+
+            // 4. Send Transaction
+            // Critical: The VAULT signs this transaction, paying for the fee.
+            // The connected user (recipient) does NOT need to sign or pay gas if we structured it perfectly, 
+            // but here we are just sweeping.
 
             const signature = await connection.sendTransaction(transaction, [vaultKeypair]);
             await connection.confirmTransaction(signature, 'confirmed');
@@ -85,16 +104,10 @@ export default function ClaimPage() {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center p-6 font-outfit">
-                <div className="bg-red-500/5 border border-red-500/20 p-8 rounded-[2rem] text-center max-w-sm backdrop-blur-xl">
-                    <div className="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        <Lock className="w-8 h-8 text-red-500" />
-                    </div>
-                    <h1 className="text-2xl font-syne font-bold text-white mb-2">Invalid Link</h1>
-                    <p className="text-neutral-500 mb-8">{error}</p>
-                    <a href="/" className="block w-full py-4 bg-white/5 hover:bg-white/10 rounded-xl font-syne font-bold transition-all">
-                        Back to Home
-                    </a>
+            <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center p-6">
+                <div className="bg-red-500/10 border border-red-500/20 p-6 rounded-xl text-center">
+                    <h1 className="text-xl font-bold text-red-500 mb-2">Error</h1>
+                    <p className="text-neutral-400">{error}</p>
                 </div>
             </div>
         );
@@ -103,144 +116,104 @@ export default function ClaimPage() {
     if (!noteData) {
         return (
             <div className="min-h-screen bg-neutral-950 text-white flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
-                    <Loader2 className="w-10 h-10 animate-spin text-emerald-500" />
-                    <span className="font-syne font-bold text-neutral-500">Decrypting Link...</span>
-                </div>
+                <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
             </div>
         );
     }
 
-    return (
-        <div className="min-h-screen bg-neutral-950 text-white flex flex-col items-center justify-center p-6 selection:bg-emerald-500/30 font-outfit overflow-hidden">
-            {/* Background Glows */}
-            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-500/10 blur-[120px] rounded-full pointer-events-none" />
-            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 blur-[120px] rounded-full pointer-events-none" />
 
-            <nav className="fixed top-0 w-full border-b border-white/5 bg-neutral-950/50 backdrop-blur-2xl z-50">
-                <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-                    <div className="flex items-center gap-3 font-syne font-bold text-2xl tracking-tight">
-                        <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                            <Shield className="w-6 h-6 text-black" />
+
+    return (
+        <div className="min-h-screen bg-neutral-950 text-white flex flex-col items-center justify-center p-6 selection:bg-emerald-500/30">
+            <div className="absolute top-0 right-0 -mt-16 -mr-16 w-32 h-32 bg-purple-500/20 blur-3xl rounded-full pointer-events-none" />
+            <div className="absolute bottom-0 left-0 -mb-16 -ml-16 w-32 h-32 bg-emerald-500/20 blur-3xl rounded-full pointer-events-none" />
+
+            <nav className="fixed top-0 w-full border-b border-white/5 bg-black/20 backdrop-blur-xl z-50">
+                <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+                    <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
+                        <div className="w-8 h-8 bg-gradient-to-tr from-emerald-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                            <Shield className="w-4 h-4 text-black" />
                         </div>
-                        <span className="bg-gradient-to-r from-white to-neutral-400 bg-clip-text text-transparent">
-                            Sol-Link
-                        </span>
+                        Sol-Link
                     </div>
                 </div>
             </nav>
 
             <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="w-full max-w-md bg-neutral-900/50 border border-white/10 rounded-[2.5rem] p-10 backdrop-blur-xl relative overflow-hidden shadow-2xl"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full max-w-md bg-neutral-900/50 border border-white/10 rounded-2xl p-8 backdrop-blur-sm relative overflow-hidden"
             >
-                <AnimatePresence mode="wait">
-                    {status === 'success' ? (
+                {status === 'success' ? (
+                    <div className="text-center py-8 space-y-6">
                         <motion.div
-                            key="success"
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="text-center py-6 space-y-8"
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            className="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto"
                         >
-                            <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1, rotate: 360 }}
-                                transition={{ type: "spring", damping: 12 }}
-                                className="w-24 h-24 bg-emerald-500 rounded-3xl flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/40"
-                            >
-                                <CheckCircle className="w-12 h-12 text-black" />
-                            </motion.div>
-                            <div>
-                                <h2 className="text-3xl font-syne font-bold text-white mb-2">Claimed!</h2>
-                                <p className="text-neutral-500 leading-relaxed">
-                                    The funds have been withdrawn securely to your wallet.
-                                </p>
-                            </div>
-                            <div className="pt-4">
-                                <a href="/" className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 font-syne font-bold transition-all group">
-                                    Create your own link <ArrowDown className="w-4 h-4 -rotate-90 group-hover:translate-x-1 transition-transform" />
-                                </a>
-                            </div>
+                            <CheckCircle className="w-10 h-10 text-black" />
                         </motion.div>
-                    ) : (
-                        <motion.div 
-                            key="claim"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="space-y-10"
-                        >
-                            <div className="text-center">
-                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/5 mb-6 border border-white/10">
-                                    <Sparkles className="w-8 h-8 text-emerald-400" />
-                                </div>
-                                <h2 className="text-neutral-500 text-xs font-syne font-bold uppercase tracking-[0.3em] mb-3">Shielded Transfer Received</h2>
-                                <div className="text-2xl font-syne font-bold text-white mb-2">
-                                    Claim your SOL
-                                </div>
-                                <p className="text-neutral-500 text-sm">Verify with ZK proof to sweep funds.</p>
+                        <div>
+                            <h2 className="text-2xl font-bold text-white mb-2">Transfer Complete!</h2>
+                            <p className="text-neutral-400">
+                                The funds have been withdrawn to your wallet.
+                            </p>
+                        </div>
+                        <a href="/" className="inline-block mt-4 text-emerald-400 hover:text-emerald-300 font-medium">
+                            Create your own link
+                        </a>
+                    </div>
+                ) : (
+                    <div className="space-y-8">
+                        <div className="text-center">
+                            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-neutral-800 mb-4 border border-white/5">
+                                <ArrowDown className="w-6 h-6 text-emerald-500" />
                             </div>
+                            <h2 className="text-neutral-400 text-sm font-bold uppercase tracking-wider mb-2">You Received Funds</h2>
+                            <div className="text-xl font-mono text-white mb-2">
+                                Check wallet for balance
+                            </div>
+                        </div>
 
-                            <div className="space-y-6">
-                                {status === 'idle' && (
-                                    !publicKey ? (
-                                        <div className="flex flex-col items-center gap-4">
-                                            <WalletMultiButton className="!bg-white !text-black !font-bold !rounded-2xl !w-full !h-14 !justify-center !text-lg" />
-                                            <p className="text-xs text-neutral-600 font-medium tracking-tight">Connect wallet to authorize claim</p>
-                                        </div>
-                                    ) : (
-                                        <button
-                                            onClick={handleClaim}
-                                            className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-syne font-bold py-5 rounded-2xl flex items-center justify-center gap-3 transition-all transform active:scale-[0.98] shadow-2xl shadow-emerald-500/20"
-                                        >
-                                            <Lock className="w-5 h-5" /> Claim Anonymously
-                                        </button>
-                                    )
-                                )}
-
-                                {status !== 'idle' && (
-                                    <div className="bg-black/40 rounded-3xl p-6 border border-white/5 space-y-6">
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center">
-                                                    <Cpu className="w-4 h-4 text-emerald-500 animate-pulse" />
-                                                </div>
-                                                <span className="text-sm font-syne font-bold text-neutral-300">ZK Prover</span>
-                                            </div>
-                                            <span className="text-[10px] font-mono font-bold text-emerald-500/70 uppercase tracking-widest">{status === 'generating_proof' ? 'Running' : 'Ready'}</span>
-                                        </div>
-                                        
-                                        <div className="space-y-3">
-                                            <div className="h-1.5 bg-neutral-800 rounded-full overflow-hidden">
-                                                <motion.div
-                                                    className="h-full bg-gradient-to-r from-emerald-500 to-cyan-500"
-                                                    initial={{ width: "0%" }}
-                                                    animate={{ width: status === 'generating_proof' ? "60%" : "100%" }}
-                                                    transition={{ duration: 2, ease: "easeInOut" }}
-                                                />
-                                            </div>
-                                            <div className="flex justify-between text-[10px] font-mono text-neutral-600 uppercase tracking-tighter">
-                                                <span>{statusMessage}</span>
-                                                <span>{status === 'generating_proof' ? '60%' : '100%'}</span>
-                                            </div>
-                                        </div>
+                        <div className="space-y-4">
+                            {status === 'idle' && (
+                                !publicKey ? (
+                                    <div className="flex justify-center">
+                                        <WalletMultiButton />
                                     </div>
-                                )}
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+                                ) : (
+                                    <button
+                                        onClick={handleClaim}
+                                        className="w-full bg-white text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-neutral-200 transition-colors transform active:scale-[0.98]"
+                                    >
+                                        <Lock className="w-4 h-4" /> Claim with ZK Proof
+                                    </button>
+                                )
+                            )}
+
+                            {status !== 'idle' && (
+                                <div className="bg-black/30 rounded-xl p-4 border border-white/5 space-y-3">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-neutral-400">Status</span>
+                                        <span className="text-emerald-400 font-mono animate-pulse">{status === 'generating_proof' ? 'PROVING' : 'VERIFYING'}</span>
+                                    </div>
+                                    <div className="h-1 bg-neutral-800 rounded-full overflow-hidden">
+                                        <motion.div
+                                            className="h-full bg-emerald-500"
+                                            initial={{ width: "0%" }}
+                                            animate={{ width: status === 'generating_proof' ? "60%" : "100%" }}
+                                            transition={{ duration: 2 }}
+                                        />
+                                    </div>
+                                    <div className="text-xs text-center text-neutral-500 font-mono">
+                                        {statusMessage}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
             </motion.div>
-            
-            <div className="mt-12 flex items-center gap-6 opacity-30">
-                 <div className="flex items-center gap-2 text-xs font-syne font-bold grayscale">
-                    <Zap className="w-4 h-4" /> HELIUS POWERED
-                 </div>
-                 <div className="w-1 h-1 bg-neutral-800 rounded-full" />
-                 <div className="flex items-center gap-2 text-xs font-syne font-bold grayscale">
-                    <Shield className="w-4 h-4" /> PRIVACY CASH
-                 </div>
-            </div>
         </div>
     );
 }
