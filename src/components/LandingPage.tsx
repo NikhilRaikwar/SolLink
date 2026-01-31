@@ -60,7 +60,7 @@ export function LandingPage() {
       {/* Hero Section */}
       <section className="relative z-10 pt-32 pb-20 px-6">
         <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
-          <motion.div 
+          <motion.div
             initial="hidden"
             animate="visible"
             variants={containerVariants}
@@ -70,7 +70,7 @@ export function LandingPage() {
               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Solana Privacy Hack 2026
             </motion.div>
-            
+
             <motion.div variants={itemVariants} className="space-y-6">
               <h1 className="text-6xl md:text-7xl font-syne font-extrabold leading-[1.1] tracking-tight">
                 Send SOL Privately – <br />
@@ -82,7 +82,7 @@ export function LandingPage() {
             </motion.div>
 
             <motion.div variants={itemVariants} className="flex flex-wrap gap-4">
-              <button 
+              <button
                 onClick={handleConnect}
                 className="group relative px-8 py-4 bg-white text-black font-syne font-bold rounded-2xl overflow-hidden transition-transform active:scale-95"
               >
@@ -114,79 +114,7 @@ export function LandingPage() {
             </motion.div>
           </motion.div>
 
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="relative"
-          >
-            {/* Animation Demo Visual */}
-            <div className="relative aspect-square max-w-[500px] mx-auto">
-              <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/20 to-cyan-500/20 rounded-[2.5rem] blur-3xl" />
-              <div className="relative h-full w-full bg-neutral-900/40 border border-white/10 rounded-[2.5rem] backdrop-blur-sm overflow-hidden flex items-center justify-center">
-                
-                {/* Simulated ZK Circuit Lines */}
-                <svg className="absolute inset-0 w-full h-full opacity-20" viewBox="0 0 100 100">
-                  <motion.path
-                    d="M 10 50 L 30 50 L 40 30 L 60 70 L 70 50 L 90 50"
-                    fill="none"
-                    stroke="url(#grad)"
-                    strokeWidth="0.5"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  />
-                  <defs>
-                    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#10b981" />
-                      <stop offset="100%" stopColor="#06b6d4" />
-                    </linearGradient>
-                  </defs>
-                </svg>
 
-                {/* Floating SOL Icons & Cards */}
-                <div className="relative space-y-4 w-full px-12">
-                  <motion.div 
-                    animate={{ y: [0, -10, 0] }}
-                    transition={{ duration: 4, repeat: Infinity }}
-                    className="p-4 bg-white/5 border border-white/10 rounded-2xl backdrop-blur-md flex items-center gap-4 transform -rotate-3"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                      <Zap className="w-5 h-5 text-emerald-400" />
-                    </div>
-                    <div>
-                      <div className="h-2 w-24 bg-white/20 rounded-full mb-2" />
-                      <div className="h-2 w-16 bg-white/10 rounded-full" />
-                    </div>
-                  </motion.div>
-
-                  <motion.div 
-                    animate={{ y: [0, 10, 0] }}
-                    transition={{ duration: 5, repeat: Infinity }}
-                    className="p-4 bg-black/40 border border-emerald-500/30 rounded-2xl backdrop-blur-md flex items-center gap-4 translate-x-8 rotate-2"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center">
-                      <Lock className="w-5 h-5 text-cyan-400" />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="h-2 w-32 bg-emerald-500/40 rounded-full" />
-                      <div className="h-1.5 w-40 bg-white/5 rounded-full" />
-                    </div>
-                  </motion.div>
-
-                  <motion.div 
-                    animate={{ scale: [1, 1.05, 1] }}
-                    transition={{ duration: 3, repeat: Infinity }}
-                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-gradient-to-tr from-emerald-500 to-cyan-500 rounded-full blur-[60px] opacity-20"
-                  />
-                  
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <Shield className="w-24 h-24 text-emerald-400/20" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </motion.div>
         </div>
       </section>
 
@@ -229,7 +157,7 @@ export function LandingPage() {
               { title: 'Claim Anonymously', desc: 'Recipient opens link → Claims SOL (Helius fast check → instant sweep)' },
               { title: 'Zero Trace Left', desc: 'Explorer shows no direct sender-receiver connection' }
             ].map((step, i) => (
-              <motion.div 
+              <motion.div
                 key={i}
                 whileHover={{ y: -10 }}
                 className="relative p-8 bg-neutral-900/50 border border-white/5 rounded-3xl space-y-6 group"
@@ -282,18 +210,15 @@ export function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 text-center space-y-12">
           <p className="text-neutral-500 text-xs font-bold uppercase tracking-[0.2em]">Competing in Solana Privacy Hack 2026</p>
           <div className="flex flex-wrap justify-center gap-12 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all">
-             <div className="flex items-center gap-2 font-syne font-bold text-xl">
-               <Shield className="w-6 h-6 text-emerald-400" /> Solana Privacy
-             </div>
-             <div className="flex items-center gap-2 font-syne font-bold text-xl">
-               <Layers className="w-6 h-6 text-cyan-400" /> Privacy Cash
-             </div>
-             <div className="flex items-center gap-2 font-syne font-bold text-xl">
-               <Zap className="w-6 h-6 text-yellow-400" /> Helius
-             </div>
-             <div className="flex items-center gap-2 font-syne font-bold text-xl uppercase tracking-tighter">
-               Bhopal, India
-             </div>
+            <div className="flex items-center gap-2 font-syne font-bold text-xl">
+              <Shield className="w-6 h-6 text-emerald-400" /> Solana Privacy
+            </div>
+            <div className="flex items-center gap-2 font-syne font-bold text-xl">
+              <Layers className="w-6 h-6 text-cyan-400" /> Privacy Cash
+            </div>
+            <div className="flex items-center gap-2 font-syne font-bold text-xl">
+              <Zap className="w-6 h-6 text-yellow-400" /> Helius
+            </div>
           </div>
         </div>
       </section>
@@ -331,23 +256,6 @@ export function LandingPage() {
               <p className="text-neutral-500 text-sm max-w-xs">
                 Privacy made simple. Built for Solana Privacy Hack 2026. Send SOL without leaving a trace.
               </p>
-            </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-16">
-              <div className="space-y-4">
-                <h5 className="font-syne font-bold text-sm uppercase tracking-widest text-neutral-400">Project</h5>
-                <ul className="space-y-3 text-neutral-500 text-sm">
-                  <li><a href="#" className="hover:text-white transition-colors">GitHub Repo</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Demo Video</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">README</a></li>
-                </ul>
-              </div>
-              <div className="space-y-4">
-                <h5 className="font-syne font-bold text-sm uppercase tracking-widest text-neutral-400">Social</h5>
-                <ul className="space-y-3 text-neutral-500 text-sm">
-                  <li><a href="https://x.com/NikhilRaikwarr" className="hover:text-white transition-colors inline-flex items-center gap-2">X / Twitter <ExternalLink className="w-3 h-3" /></a></li>
-                </ul>
-              </div>
             </div>
           </div>
 
