@@ -47,6 +47,8 @@ The sender connects their wallet and deposits SOL into the Sol-Link protocol.
 
 ## 🔄 Flow Diagram
 
+![Sol-Link Flowchart](public/sollink-light.png)
+
 ```mermaid
 sequenceDiagram
     participant Sender
