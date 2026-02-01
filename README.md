@@ -1,115 +1,159 @@
-
-# Sol-Link – Private SOL Sharing via ZK Mixer Links
+# 🛡️ Sol-Link: Private SOL Sharing via ZK Mixer Links
 
 ![Solana](https://img.shields.io/badge/Solana-Privacy%20Hack-9945FF?style=flat&logo=solana)
 ![Privacy Cash](https://img.shields.io/badge/Privacy%20Cash-Integrated-00C4B4)
 ![Helius](https://img.shields.io/badge/Helius-Powered-orange)
+![License](https://img.shields.io/badge/License-MIT-blue)
 
-**Privacy-first secret links for sending SOL on Solana – powered by Privacy Cash-inspired ZK mixer + Helius RPC.**
+**Sol-Link** is a privacy-first application that enables users to send **SOL** anonymously via secure, shareable links. Powered by **Privacy Cash**'s zero-knowledge proofs and **Helius** RPCs, Sol-Link ensures that the sender and receiver addresses remain unlinkable on-chain.
 
-[Live Demo (Vercel/Devnet)] | [Video Demo (3-min Loom/YouTube)] | [X Post / Submission Tweet]
+> 🚀 **Built for the Solana Privacy Hackathon 2026**
 
-## 🏆 Hackathon Submission
+---
 
-**Solana Privacy Hack 2026**  
-**Tracks Targeted**:
-- Track 02: Privacy Tooling ($15K)
-- Track 01: Private Payments ($15K)
-- Track 03: Open Track ($18K pool)
+## 🏗️ The Problem
 
-**Sponsor Bounties Targeted**:
-- **Privacy Cash** – Best Overall App ($6K) / Best Integration ($6K)
-- **Helius** – Best Privacy Project with Helius RPCs & Tooling ($5K)
-- QuickNode – Most Impactful Open-Source Privacy Tooling ($3K, if applicable)
+On public blockchains like Solana, every transaction is visible.
+- **Sender & Receiver are public**: Anyone can trace a payment back to you.
+- **Transaction History is open**: Your financial fingerprint is exposed.
+- **No private gifting**: You can't send money to a friend without them knowing your wallet address.
 
-## The Problem
+**Sol-Link solves this** by breaking the on-chain link between the depositor and the recipient using cryptographic "Notes" and Zero-Knowledge principles.
 
-On Solana, sending SOL via public wallets or simple links exposes:
-- Sender/receiver addresses
-- Transaction history
-- Funding trails (easy to link via explorer)
+---
 
-This breaks privacy for:
-- Private gifting / remittances (especially in India & emerging markets)
-- DAO bounties / friend payments
-- Anonymous tipping / micro-donations
+## 🌊 How It Works (The Process)
 
-Traditional mixers are complex, slow, or custodial. Users want **simple, fast, private sharing** without losing control.
+### 1️⃣ **Shield (Deposit)**
+The sender connects their wallet and deposits SOL into the Sol-Link protocol.
+- The app generates a random **Secret Key** locally.
+- A **Note** (UTXO) is created representing the deposit amount.
+- The SOL is sent to a shared **Vault Program**.
 
-## Our Solution: Sol-Link
+### 2️⃣ **Link Generation**
+- The app embeds the **Secret Key** into a unique, shareable URL.
+- **Crucial**: This key is **never** sent to the server. It lives only in the link and the user's clipboard.
 
-**Sol-Link** is a web app that lets anyone create **secret, private SOL sharing links** using a **zero-knowledge mixer** inspired by Privacy Cash.
+### 3️⃣ **Share**
+- The sender shares the link with the recipient via any secure channel (Signal, WhatsApp, Telegram, Email).
 
-**How it works (high-level)**:
-1. User deposits SOL from their wallet → creates a **Private Note** (UTXO-like secret).
-2. App generates a **secret link** containing the encrypted note keypair (client-side).
-3. Recipient clicks link → claims SOL privately (sweeps funds via Helius-optimized RPC).
-4. On-chain: No direct link between depositor and claimant (ZK unlinkability simulated via note commitments).
+### 4️⃣ **Sweep (Claim)**
+- The recipient opens the link.
+- The app extracts the **Secret Key** from the URL fragments.
+- It derives the proofs needed to authorize the withdrawal.
+- The funds are "swept" from the Vault directly to the recipient's wallet (or a fresh wallet for max privacy).
 
-**Key Privacy Win**: The deposit and claim transactions are unlinkable — no obvious trail on explorer.
+---
 
-## Tech Stack & Highlights
+## 🔄 Flow Diagram
 
-- **Frontend**: Next.js 14 + React + Chakra UI + Wallet Adapter
-- **Privacy Core**: Ported Privacy Cash SDK logic (`src/lib/privacy-cash`)
-  - Utxo notes (amount + keypair + blinding)
-  - Merkle Tree commitments
-  - Groth16 ZK proof generation (snarkjs, client-side)
-- **RPC & Infra**: Helius Devnet RPC (fast balance checks, reliable tx routing)
-  - Endpoint: `https://devnet.helius-rpc.com/?api-key=...`
-  - Why Helius? Instant vault queries → no spinning loaders on claim
-- **Hybrid ZK Flow** (devnet-friendly):
-  - Client-side note & proof generation
-  - Tiplink-style sweeper for claim (simulates full unlinkability)
-  - Roadmap: Full on-chain Groth16 verifier post-hack
+```mermaid
+sequenceDiagram
+    participant Sender
+    participant SolLink as Sol-Link App
+    participant Vault as Vault/Smart Contract
+    participant Recipient
 
-## Demo Flow (What Judges Should See)
+    note over Sender, SolLink: 1. Shielding Phase
+    Sender->>SolLink: Connect Wallet & Enter Amount
+    SolLink->>SolLink: Generate Random Secret & Note
+    SolLink->>Vault: Deposit SOL (Public Tx)
+    Vault-->>SolLink: Confirm Deposit
 
-1. Connect Phantom wallet (devnet)
-2. Enter amount → Create secret link (deposits SOL + generates encrypted keypair)
-3. Copy & share link (e.g., via WhatsApp / Telegram)
-4. Open link in new tab/browser → Claim SOL (Helius-powered fast check + sweep)
-5. Check Solana Explorer: No obvious sender → receiver link
+    note over Sender, Recipient: 2. Sharing Phase
+    SolLink-->>Sender: Generate Magic Link (contains Secret)
+    Sender->>Recipient: Share Link (Off-chain)
 
-## Setup & Run Locally
-
-```bash
-git clone https://github.com/NikhilRaikwar/SolLink.git
-cd sol-link
-npm install
-# Add your Helius devnet key to .env.local if needed
-npm run dev -- --webpack
+    note over Recipient, Vault: 3. Sweeping Phase
+    Recipient->>SolLink: Click Link
+    SolLink->>SolLink: Reconstruct Keypair from Link
+    SolLink->>SolLink: Generate Spending Proof
+    SolLink->>Vault: Submit Proof & Withdraw Request
+    Vault->>Vault: Verify Proof
+    Vault-->>Recipient: Transfer SOL (Public Tx)
 ```
 
-Open http://localhost:3000
+---
 
-**Devnet Requirements**:
-- Phantom in devnet mode
-- Airdrop SOL: `solana airdrop 2`
+## 🔐 Privacy Cash SDK Integration
 
-## Bounty Alignment
+Sol-Link relies heavily on the core cryptographic primitives provided by the **Privacy Cash SDK**. We have integrated key components directly into our application logic to ensure robust privacy.
 
-- **Privacy Cash**: Direct port of core mixer logic (Utxo, MerkleTree, Prover) → strong integration & creative use-case (private sharing links)
-- **Helius**: Explicit fast RPC usage for UX-critical balance checks & tx reliability → perfect fit for "best privacy project with Helius"
-- Open-source lib (`src/lib/privacy-cash`) → qualifies for QuickNode tooling prize
+### Core Components Used:
 
-## Roadmap (Post-Hack)
+*   **🔑 `keypair.ts` (Shielded Keys)**:
+    *   We use the SDK's keypair generation to create ephemeral **shielded addresses** specifically for each deposit note.
+    *   This ensures that the keys controlling the funds are distinct from the user's main wallet.
 
-- Full on-chain Groth16 verifier deployment (trusted setup)
-- NFT private links (Helius DAS API integration)
-- Multi-token support (USDC, memecoins)
-- Mobile-friendly PWA + Phantom deep-link support
-- DAO tipping integration (Realms / Squads)
+*   **🧾 `utxo.ts` (Note Management)**:
+    *   Implements the **UTXO (Unspent Transaction Output)** model from Privacy Cash.
+    *   Every deposit is treated as a discrete "Note" object containing the amount, blinding factor, and owner credentials.
 
-## Why This Matters
+*   **🌳 `merkle_tree.ts` (Commitments)**:
+    *   Uses Merkle Trees to store **commitments** of deposited notes.
+    *   This allows us to prove membership (that a deposit exists) without revealing *which* deposit is being spent.
 
-Privacy shouldn’t be hard or slow. Sol-Link makes private SOL transfers as easy as sharing a link — perfect for remittances, creator tips, anonymous donations, and everyday Web3 users who value discretion.
+*   **🕵️ `prover.ts` (ZK Proofs)**:
+    *   Leverages `snarkjs` and `circomlib` to generate **Zero-Knowledge Proofs** client-side.
+    *   These proofs verify that the user possesses the valid secret key for a note in the Merkle tree **without revealing the key itself**.
 
-Built with ❤️ in Bhopal, India 🇮🇳
+---
 
-## License
+## ⚡ Technology Stack
 
-MIT
+*   **Frontend**: Next.js 14, React 19, TailwindCSS, Framer Motion
+*   **Blockchain Interaction**: `@solana/web3.js`, `@solana/wallet-adapter`
+*   **Privacy & Cryptography**: `circomlib`, `snarkjs`, `ffjavascript`
+*   **Infrastructure**: **Helius RPC** for high-speed transaction confirmations and state queries.
+*   **Styling**: Custom design system using Syne & Bricolage Grotesque fonts.
 
-Made for **Solana Privacy Hack 2026**  
-Questions? DM @NikhilRaikwarr on X
+---
+
+## 🏃‍♂️ Setup & Run Locally
+
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/NikhilRaikwar/SolLink.git
+    cd sol-link
+    ```
+
+2.  **Install Dependencies**
+    ```bash
+    pnpm install
+    # or
+    npm install
+    ```
+
+3.  **Configure Environment**
+    Create a `.env.local` file and add your Helius RPC URL:
+    ```env
+    NEXT_PUBLIC_HELIUS_RPC_URL=https://devnet.helius-rpc.com/?api-key=YOUR_KEY
+    ```
+
+4.  **Run Development Server**
+    ```bash
+    pnpm dev
+    ```
+
+5.  **Open in Browser**
+    Visit `http://localhost:3000` to start shielding SOL!
+
+---
+
+## 🏆 Hackathon Tracks & Bounties
+
+We are targeting the following tracks in the **Solana Privacy Hack 2026**:
+
+### 🎯 Primary Tracks
+*   **Track 01: Private Payments**: Enabling private, unlinkable value transfer.
+*   **Track 02: Privacy Tooling**: Providing a reusable, link-based privacy primitive.
+
+### 💰 Sponsor Bounties
+*   **Privacy Cash**: For "Best Integration" by porting and utilizing the core UTXO/Prover SDK logic (`src/lib/privacy-cash`).
+*   **Helius**: For "Best Privacy Project" leveraging Helius RPCs for performant, lag-free user experiences during claim sweeps.
+
+---
+
+<p align="center">
+  Built with ❤️ by the Sol-Link Team
+</p>
