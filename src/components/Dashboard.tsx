@@ -38,7 +38,7 @@ export function Dashboard() {
       await connection.confirmTransaction(signature, 'confirmed');
 
       const secretKeyString = Buffer.from(solanaKeypair.secretKey).toString('base64');
-      const link = `${window.location.origin}/claim/${encodeURIComponent(secretKeyString)}`;
+      const link = `${window.location.origin}/claim#${encodeURIComponent(secretKeyString)}`;
       setGeneratedLink(link);
       setStep(2);
 
@@ -203,7 +203,7 @@ export function Dashboard() {
                         className="relative bg-neutral-50 border border-border-subtle rounded-[2rem] p-8 pr-24 break-all font-mono text-sm text-foreground/80 leading-relaxed cursor-pointer hover:border-foreground/20 transition-all shadow-inner"
                         onClick={copyToClipboard}
                       >
-                        <span className="text-accent-primary font-bold">sollink.me/claim/</span>{generatedLink?.split('/').pop()}
+                        <span className="text-accent-primary font-bold">sollink.me/claim#</span>{generatedLink?.split('#').pop()}
                         <div className="absolute right-8 top-1/2 -translate-y-1/2 text-neutral-300 group-hover:text-foreground transition-colors">
                           <Copy className="w-7 h-7" />
                         </div>
