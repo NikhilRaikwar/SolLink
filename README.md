@@ -51,13 +51,15 @@ The sender connects their wallet and deposits SOL into the Sol-Link protocol.
 sequenceDiagram
     participant Sender
     participant SolLink as Sol-Link App
+    participant Helius as Helius RPC
     participant Vault as Vault/Smart Contract
     participant Recipient
 
-    note over Sender, SolLink: 1. Shielding Phase
+    note over Sender, SolLink: 1. Shielding Phase (Powered by Privacy Cash)
     Sender->>SolLink: Connect Wallet & Enter Amount
-    SolLink->>SolLink: Generate Random Secret & Note
-    SolLink->>Vault: Deposit SOL (Public Tx)
+    SolLink->>SolLink: [Privacy Cash] Generate Secret & UTXO Note
+    SolLink->>Helius: Check Account Balance
+    SolLink->>Vault: Deposit SOL (Public Tx via Helius)
     Vault-->>SolLink: Confirm Deposit
 
     note over Sender, Recipient: 2. Sharing Phase
@@ -66,8 +68,9 @@ sequenceDiagram
 
     note over Recipient, Vault: 3. Sweeping Phase
     Recipient->>SolLink: Click Link
-    SolLink->>SolLink: Reconstruct Keypair from Link
-    SolLink->>SolLink: Generate Spending Proof
+    SolLink->>Helius: Query Chain State
+    SolLink->>SolLink: [Privacy Cash] Reconstruct Keypair
+    SolLink->>SolLink: [Privacy Cash] Generate ZK Proof
     SolLink->>Vault: Submit Proof & Withdraw Request
     Vault->>Vault: Verify Proof
     Vault-->>Recipient: Transfer SOL (Public Tx)
