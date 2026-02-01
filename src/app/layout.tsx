@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Syne, Plus_Jakarta_Sans, JetBrains_Mono, Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
 import { SolanaWalletProvider } from "@/components/Providers";
+import { Analytics } from "@vercel/analytics/next";
 
 import ErrorReporter from "@/components/ErrorReporter";
 import Script from "next/script";
@@ -60,7 +61,7 @@ export default function RootLayout({
         <SolanaWalletProvider>
           {children}
         </SolanaWalletProvider>
-
+        <Analytics />
       </body>
     </html>
   );
