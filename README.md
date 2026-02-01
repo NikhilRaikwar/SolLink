@@ -151,11 +151,20 @@ We are targeting the following tracks in the **Solana Privacy Hack 2026**:
 
 ### 🎯 Primary Tracks
 *   **Track 01: Private Payments**: Enabling private, unlinkable value transfer.
-*   **Track 02: Privacy Tooling**: Providing a reusable, link-based privacy primitive.
 
 ### 💰 Sponsor Bounties
 *   **Privacy Cash**: For "Best Integration" by porting and utilizing the core UTXO/Prover SDK logic (`src/lib/privacy-cash`).
 *   **Helius**: For "Best Privacy Project" leveraging Helius RPCs for performant, lag-free user experiences during claim sweeps.
+
+---
+
+## ⚡ Helius RPC Integration
+
+Sol-Link requires extremely stable and fast connection to the Solana blockchain to ensure the user experience of "Magic Links" feels instant. We use Helius RPCs exclusively for:
+
+*   **🏎️ Instant State Queries**: Fetching the latest Merkle Tree state and inclusion paths via `getAccountInfo` with zero latency.
+*   **✅ Reliable Confirmations**: We heavily leverage Helius's optimized transaction propagation to ensure the "Sweep" transaction (which contains the ZK proof) is confirmed in seconds, preventing users from seeing "Transaction Expired" errors.
+*   **🛡️ Rate Limit Protection**: Privacy operations often require multiple sequential RPC calls; Helius ensures we don't hit public node limits.
 
 ---
 
