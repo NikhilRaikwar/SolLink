@@ -102,6 +102,14 @@ Sol-Link relies heavily on the core cryptographic primitives provided by the **P
     *   Leverages `snarkjs` and `circomlib` to generate **Zero-Knowledge Proofs** client-side.
     *   These proofs verify that the user possesses the valid secret key for a note in the Merkle tree **without revealing the key itself**.
 
+## ⚡ Helius RPC Integration
+
+Sol-Link requires extremely stable and fast connection to the Solana blockchain to ensure the user experience of "Magic Links" feels instant. We use Helius RPCs exclusively for:
+
+*   **🏎️ Instant State Queries**: Fetching the latest Merkle Tree state and inclusion paths via `getAccountInfo` with zero latency.
+*   **✅ Reliable Confirmations**: We heavily leverage Helius's optimized transaction propagation to ensure the "Sweep" transaction (which contains the ZK proof) is confirmed in seconds, preventing users from seeing "Transaction Expired" errors.
+*   **🛡️ Rate Limit Protection**: Privacy operations often require multiple sequential RPC calls; Helius ensures we don't hit public node limits.
+
 ---
 
 ## ⚡ Technology Stack
@@ -158,15 +166,6 @@ We are targeting the following tracks in the **Solana Privacy Hack 2026**:
 
 ---
 
-## ⚡ Helius RPC Integration
-
-Sol-Link requires extremely stable and fast connection to the Solana blockchain to ensure the user experience of "Magic Links" feels instant. We use Helius RPCs exclusively for:
-
-*   **🏎️ Instant State Queries**: Fetching the latest Merkle Tree state and inclusion paths via `getAccountInfo` with zero latency.
-*   **✅ Reliable Confirmations**: We heavily leverage Helius's optimized transaction propagation to ensure the "Sweep" transaction (which contains the ZK proof) is confirmed in seconds, preventing users from seeing "Transaction Expired" errors.
-*   **🛡️ Rate Limit Protection**: Privacy operations often require multiple sequential RPC calls; Helius ensures we don't hit public node limits.
-
----
 
 <p align="center">
   Built with ❤️ by the Sol-Link Team
