@@ -32,7 +32,7 @@ The sender connects their wallet and deposits SOL into the Sol-Link protocol.
 
 ### 2️⃣ **Link Generation**
 - The app embeds the **Secret Key** into a unique, shareable URL.
-- **Crucial**: This key is **never** sent to the server. It lives only in the link and the user's clipboard.
+- **Crucial**: This key is **never** sent to the server. It lives only in the link as a **URL Fragment** (`#`) and the user's clipboard. This prevents server-side logging of keys.
 
 ### 3️⃣ **Share**
 - The sender shares the link with the recipient via any secure channel (Signal, WhatsApp, Telegram, Email).
