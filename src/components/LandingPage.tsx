@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Shield, ArrowRight, Play, Zap, Lock, Link as LinkIcon, ExternalLink, Github, Twitter, Layers, Fingerprint, EyeOff, Terminal } from 'lucide-react';
+import { motion, Variants } from 'framer-motion';
+import { Shield, ArrowRight, EyeOff, Globe, Cpu, Lock, Zap, Terminal } from 'lucide-react';
 import { WalletMultiButton, useWalletModal } from '@solana/wallet-adapter-react-ui';
 import { useWallet } from '@solana/wallet-adapter-react';
 
@@ -15,7 +15,8 @@ export function LandingPage() {
       setVisible(true);
     }
   };
-  const containerVariants = {
+
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -26,249 +27,183 @@ export function LandingPage() {
     },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] }
+    },
   };
 
   return (
-    <div className="min-h-screen bg-[#030303] text-white font-outfit selection:bg-emerald-500/30 overflow-x-hidden">
-      {/* Background Effects */}
+    <div className="min-h-screen bg-white text-foreground font-plus-jakarta selection:bg-accent-primary/20 overflow-x-hidden">
+
+      {/* Background Atmosphere */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[-10%] w-[1000px] h-[1000px] bg-emerald-600/5 blur-[120px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[1000px] h-[1000px] bg-cyan-600/5 blur-[120px] rounded-full" />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-100 contrast-150 mix-blend-overlay" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-accent-primary/5 blur-[120px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-accent-secondary/5 blur-[120px] rounded-full" />
+        <div className="absolute inset-0 grid-bg opacity-[0.03]" />
       </div>
 
-      <nav className="relative z-50 border-b border-white/5 bg-black/20 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
-              <Shield className="w-5 h-5 text-black stroke-[2.5px]" />
+      <nav className="relative z-50">
+        <div className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-3 group cursor-pointer"
+          >
+            <div className="relative w-12 h-12 flex items-center justify-center bg-foreground rounded-[1.25rem] paper-shadow">
+              <Shield className="w-6 h-6 text-white stroke-[2.5px]" />
             </div>
-            <span className="font-syne font-bold text-2xl tracking-tight">Sol-Link</span>
-          </div>
-          <div className="flex items-center gap-6">
-            <a href="https://github.com" target="_blank" className="text-neutral-400 hover:text-white transition-colors">
-              <Github className="w-5 h-5" />
-            </a>
-            <WalletMultiButton />
-          </div>
+            <div className="flex flex-col">
+              <span className="font-syne font-black text-2xl tracking-tight uppercase leading-none">SOLlink</span>
+              <span className="text-[10px] font-bold text-accent-primary tracking-[0.2em] uppercase">Stealth Network</span>
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-6"
+          >
+            <div className="[&_.wallet-adapter-button]:font-syne [&_.wallet-adapter-button]:font-black [&_.wallet-adapter-button]:bg-foreground [&_.wallet-adapter-button]:text-white [&_.wallet-adapter-button]:px-8 [&_.wallet-adapter-button]:h-12 [&_.wallet-adapter-button]:rounded-full [&_.wallet-adapter-button]:hover:bg-accent-primary [&_.wallet-adapter-button]:hover:text-black [&_.wallet-adapter-button]:transition-all [&_.wallet-adapter-button]:text-xs [&_.wallet-adapter-button]:uppercase [&_.wallet-adapter-button]:tracking-widest [&_.wallet-adapter-button]:border-none paper-shadow">
+              <WalletMultiButton>{connected ? 'Connected' : 'Connect Wallet'}</WalletMultiButton>
+            </div>
+          </motion.div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 pt-32 pb-20 px-6">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-20 items-center">
+      <section className="relative z-10 pt-24 pb-24 px-6">
+        <div className="max-w-7xl mx-auto">
           <motion.div
             initial="hidden"
             animate="visible"
             variants={containerVariants}
-            className="space-y-10"
+            className="text-center space-y-16"
           >
-            <motion.div variants={itemVariants} className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold tracking-widest uppercase">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Solana Privacy Hack 2026
-            </motion.div>
-
             <motion.div variants={itemVariants} className="space-y-6">
-              <h1 className="text-6xl md:text-7xl font-syne font-extrabold leading-[1.1] tracking-tight">
-                Send SOL Privately – <br />
-                <span className="bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent">No Trails, No Links.</span>
+              <h1 className="text-6xl md:text-8xl font-bricolage font-black leading-[0.9] tracking-tighter text-foreground max-w-6xl mx-auto">
+                Private Assets. <br />
+                <span className="accent-gradient">Zero Trails.</span>
               </h1>
-              <p className="text-xl text-neutral-400 max-w-xl leading-relaxed">
-                Create secret links to share SOL. Powered by zero-knowledge mixer tech. Recipient claims without connecting wallets on-chain.
+              <p className="text-xl md:text-2xl text-neutral-500 max-w-2xl leading-relaxed mx-auto font-medium">
+                Shield your Solana transactions with zero-knowledge secret links. <br className="hidden md:block" /> Secure, instant, and completely anonymous.
               </p>
             </motion.div>
 
-            <motion.div variants={itemVariants} className="flex flex-wrap gap-4">
+            <motion.div variants={itemVariants} className="flex flex-wrap justify-center gap-8 pt-8">
               <button
                 onClick={handleConnect}
-                className="group relative px-8 py-4 bg-white text-black font-syne font-bold rounded-2xl overflow-hidden transition-transform active:scale-95"
+                className="group relative px-14 py-6 bg-foreground text-white font-syne font-black rounded-full overflow-hidden transition-all hover:scale-105 active:scale-95 paper-shadow"
               >
-                <div className="absolute inset-0 bg-emerald-400 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-                <span className="relative flex items-center gap-2">
-                  Create Private Link <ArrowRight className="w-5 h-5" />
+                <span className="relative z-10 flex items-center gap-3 text-xl uppercase tracking-tighter">
+                  Launch App <ArrowRight className="w-6 h-6 transition-transform group-hover:translate-x-1" />
                 </span>
+                <div className="absolute inset-0 bg-accent-primary translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
               </button>
-              <button className="px-8 py-4 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-syne font-bold rounded-2xl transition-all active:scale-95 flex items-center gap-2">
-                <Play className="w-4 h-4 fill-current" /> Watch 60s Demo
-              </button>
-            </motion.div>
-
-            <motion.div variants={itemVariants} className="flex items-center gap-8 pt-4">
-              <div className="flex flex-col">
-                <span className="text-neutral-500 text-xs font-bold uppercase tracking-widest mb-2">Inspired By</span>
-                <span className="font-syne font-bold text-sm text-neutral-300">Privacy Cash</span>
-              </div>
-              <div className="w-px h-8 bg-white/10" />
-              <div className="flex flex-col">
-                <span className="text-neutral-500 text-xs font-bold uppercase tracking-widest mb-2">Powered By</span>
-                <span className="font-syne font-bold text-sm text-neutral-300">Helius RPC</span>
-              </div>
-              <div className="w-px h-8 bg-white/10" />
-              <div className="flex flex-col">
-                <span className="text-neutral-500 text-xs font-bold uppercase tracking-widest mb-2">Status</span>
-                <span className="font-syne font-bold text-sm text-neutral-300">Devnet Live</span>
-              </div>
             </motion.div>
           </motion.div>
-
-
         </div>
       </section>
 
-      {/* Trust Bar */}
-      <section className="relative z-10 border-y border-white/5 bg-white/[0.02] py-12">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { icon: EyeOff, label: 'Unlinkable Transfers', desc: 'Broken chain tech' },
-              { icon: Fingerprint, label: 'Zero-Knowledge Proofs', desc: 'Secure math verification' },
-              { icon: Terminal, label: 'No On-Chain Trail', desc: 'Explorer-safe privacy' },
-              { icon: Zap, label: 'Helius Fast RPC', desc: 'Instant claim speed' }
-            ].map((item, i) => (
-              <div key={i} className="flex flex-col items-center text-center space-y-3 group">
-                <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-emerald-500/10 transition-colors">
-                  <item.icon className="w-6 h-6 text-neutral-500 group-hover:text-emerald-400 transition-colors" />
+      {/* Stats & Info Section */}
+      <section className="relative z-10 px-6 max-w-7xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-16 items-start">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            className="space-y-6"
+          >
+            <h2 className="text-4xl md:text-6xl font-bricolage font-extrabold leading-[0.9] tracking-tighter">
+              Shield <br />
+              <span className="accent-gradient">Terminal.</span>
+            </h2>
+            <p className="text-neutral-500 text-lg leading-relaxed font-medium">
+              Execute private asset shielding. All cryptographic proofs are generated locally to ensure zero-knowledge of your intent.
+            </p>
+          </motion.div>
+
+          <div className="space-y-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="grid grid-cols-2 gap-4"
+            >
+              {[
+                { label: 'Security', value: 'ZK-SNARK', icon: Lock, color: 'text-indigo-600 bg-indigo-50' },
+                { label: 'Network', value: 'DEVNET', icon: Globe, color: 'text-orange-600 bg-orange-50' },
+                { label: 'Latency', value: '< 1.2s', icon: Zap, color: 'text-cyan-600 bg-cyan-50' },
+                { label: 'Status', value: 'ONLINE', icon: Terminal, color: 'text-emerald-600 bg-emerald-50' }
+              ].map((item, i) => (
+                <div key={i} className="p-6 bg-white border border-border-subtle rounded-[2rem] space-y-4 hover:border-foreground/10 transition-all paper-shadow">
+                  <div className={`w-10 h-10 rounded-xl ${item.color} flex items-center justify-center`}>
+                    <item.icon className="w-5 h-5 stroke-[2px]" />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-400">{item.label}</p>
+                    <p className="text-xs font-bold font-syne text-foreground uppercase tracking-wider">{item.value}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-syne font-bold text-sm text-neutral-200">{item.label}</h3>
-                  <p className="text-neutral-500 text-xs">{item.desc}</p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </motion.div>
+
+
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="relative z-10 py-32 px-6">
-        <div className="max-w-7xl mx-auto space-y-20">
-          <div className="text-center space-y-4">
-            <h2 className="text-4xl md:text-5xl font-syne font-bold">How It Works</h2>
-            <p className="text-neutral-400 max-w-2xl mx-auto">Built with ported Privacy Cash ZK mixer logic + Helius RPC for speed.</p>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-8">
-            {[
-              { title: 'Deposit & Create', desc: 'Wallet → Enter amount → Generate secret link (copy button glows)' },
-              { title: 'Share Privately', desc: 'Send link via WhatsApp/Telegram/DM (no wallet address exposed)' },
-              { title: 'Claim Anonymously', desc: 'Recipient opens link → Claims SOL (Helius fast check → instant sweep)' },
-              { title: 'Zero Trace Left', desc: 'Explorer shows no direct sender-receiver connection' }
-            ].map((step, i) => (
-              <motion.div
-                key={i}
-                whileHover={{ y: -10 }}
-                className="relative p-8 bg-neutral-900/50 border border-white/5 rounded-3xl space-y-6 group"
-              >
-                <div className="text-6xl font-syne font-black text-white/5 absolute top-4 right-6 group-hover:text-emerald-500/10 transition-colors">{i + 1}</div>
-                <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-black shadow-lg shadow-emerald-500/20">
-                  {i === 0 && <Layers className="w-6 h-6" />}
-                  {i === 1 && <Twitter className="w-6 h-6" />}
-                  {i === 2 && <Zap className="w-6 h-6" />}
-                  {i === 3 && <Shield className="w-6 h-6" />}
-                </div>
-                <div className="space-y-3">
-                  <h3 className="text-xl font-syne font-bold">{step.title}</h3>
-                  <p className="text-neutral-400 text-sm leading-relaxed">{step.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Grid */}
-      <section className="relative z-10 py-32 px-6 bg-emerald-500/[0.02]">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-12">
-          {[
-            { title: 'Private SOL sharing', desc: 'No direct wallet linking ever exposed on explorer.' },
-            { title: 'Client-side ZK', desc: 'Note generation with Utxo + blinding for maximum safety.' },
-            { title: 'Instant Claims', desc: 'Powered by Helius RPC for sub-second verification.' },
-            { title: 'Secret Links', desc: 'Encrypted link format means no public address leaks.' },
-            { title: 'Mobile Ready', desc: 'PWA-compatible interface built for the modern web.' },
-            { title: 'Open Source', desc: 'Hackathon-built with MIT license. Transparency is key.' }
-          ].map((feature, i) => (
-            <div key={i} className="flex gap-5">
-              <div className="mt-1">
-                <div className="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <h4 className="font-syne font-bold text-lg">{feature.title}</h4>
-                <p className="text-neutral-400 text-sm leading-relaxed">{feature.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Hackathon Badges */}
-      <section className="relative z-10 py-20 border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-6 text-center space-y-12">
-          <p className="text-neutral-500 text-xs font-bold uppercase tracking-[0.2em]">Competing in Solana Privacy Hack 2026</p>
-          <div className="flex flex-wrap justify-center gap-12 grayscale opacity-40 hover:grayscale-0 hover:opacity-100 transition-all">
-            <div className="flex items-center gap-2 font-syne font-bold text-xl">
-              <Shield className="w-6 h-6 text-emerald-400" /> Solana Privacy
-            </div>
-            <div className="flex items-center gap-2 font-syne font-bold text-xl">
-              <Layers className="w-6 h-6 text-cyan-400" /> Privacy Cash
-            </div>
-            <div className="flex items-center gap-2 font-syne font-bold text-xl">
-              <Zap className="w-6 h-6 text-yellow-400" /> Helius
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="relative z-10 py-32 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="relative p-12 md:p-20 bg-neutral-900 rounded-[3rem] border border-white/10 text-center space-y-10 overflow-hidden">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1/2 bg-emerald-500/10 blur-[100px] pointer-events-none" />
-            <div className="space-y-6 relative z-10">
-              <h2 className="text-4xl md:text-5xl font-syne font-bold leading-tight">Ready to send SOL <br />with total privacy?</h2>
-              <p className="text-neutral-400 text-lg">Requires Phantom in devnet mode. Airdrop SOL first.</p>
-            </div>
-            <div className="relative z-10 flex flex-col items-center gap-6">
-              <button className="px-12 py-5 bg-emerald-500 hover:bg-emerald-400 text-black font-syne font-black text-lg rounded-2xl transition-all shadow-xl shadow-emerald-500/20 active:scale-95">
-                Try Sol-Link on Devnet Now
-              </button>
-              <p className="text-neutral-600 text-xs">ZK proofs generated client-side • Devnet only – no real funds at risk</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="relative z-10 pt-20 pb-12 px-6 border-t border-white/5">
-        <div className="max-w-7xl mx-auto space-y-12">
-          <div className="flex flex-col md:flex-row justify-between items-start gap-12">
-            <div className="space-y-6">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
-                  <Shield className="w-4 h-4 text-white" />
-                </div>
-                <span className="font-syne font-bold text-xl">Sol-Link</span>
-              </div>
-              <p className="text-neutral-500 text-sm max-w-xs">
-                Privacy made simple. Built for Solana Privacy Hack 2026. Send SOL without leaving a trace.
+      {/* Simplified CTA */}
+      <section className="relative z-10 py-40 px-6">
+        <div className="max-w-6xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="relative p-20 md:p-32 bg-foreground rounded-[4rem] text-center space-y-12 overflow-hidden shadow-2xl"
+          >
+            <div className="absolute inset-0 bg-accent-primary/10 blur-[150px] pointer-events-none" />
+            <div className="space-y-8 relative z-10">
+              <h2 className="text-5xl md:text-8xl font-bricolage font-black leading-[0.9] tracking-tighter text-white">
+                Enter the <br /><span className="text-accent-primary">Stealth Layer.</span>
+              </h2>
+              <p className="text-neutral-400 text-xl max-w-xl mx-auto font-medium">
+                The most advanced private distribution network on Solana is ready for your first link.
               </p>
             </div>
+            <div className="relative z-10">
+              <button
+                onClick={handleConnect}
+                className="px-16 py-8 bg-white text-black font-syne font-black text-2xl rounded-full transition-all hover:scale-110 active:scale-95 paper-shadow"
+              >
+                Start Shielding
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Clean Footer */}
+      <footer className="relative z-10 py-20 px-6 border-t border-neutral-100">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-foreground rounded-xl flex items-center justify-center">
+              <Shield className="w-5 h-5 text-white" />
+            </div>
+            <span className="font-syne font-black text-xl tracking-tighter uppercase">SOLlink</span>
           </div>
 
-          <div className="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-            <p className="text-neutral-500 text-xs font-medium">
-              © 2026 Sol-Link. Built with ❤️ by <a href="https://x.com/NikhilRaikwarr" className="text-neutral-300 hover:text-emerald-400 transition-colors">NikhilRaikwar</a>
-            </p>
-            <div className="flex gap-8 text-neutral-500 text-xs font-medium">
-              <span>Privacy First</span>
-              <span>Open Source</span>
-              <span>Solana Devnet</span>
-            </div>
+          <div className="flex gap-12 text-[10px] font-black text-neutral-400 uppercase tracking-[0.3em]">
+            <a href="https://github.com/NikhilRaikwar/SolLink" target="_blank" rel="noopener noreferrer" className="cursor-pointer hover:text-accent-primary transition-colors">Github</a>
           </div>
+
+          <p className="text-neutral-400 text-[10px] font-black tracking-[0.2em] uppercase">
+            © 2026 SOLLINK PROTOCOL.
+          </p>
         </div>
       </footer>
     </div>
